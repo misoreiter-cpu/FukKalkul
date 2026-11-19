@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IzoFuk" />
+  <title>IzoFuk Kalkulačka</title>
+  <link rel="manifest" id="pwa-manifest" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --primary: #0f766e;
+      --primary-hover: #0d5c56;
+      --primary-light: #f0fdfa;
+      --primary-border: #5eead4;
+      --accent: #ea580c;
+      --success: #15803d;
+      --success-light: #f0fdf4;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 12px;
+      padding-bottom: 36px;
+    }
+
+    .container { max-width: 1160px; margin: 0 auto; }
+
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-badge {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+    .brand-title h1 { font-size: 18px; font-weight: 800; }
+    .brand-title p { font-size: 12.5px; color: var(--text-muted); }
+
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    .install-banner {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.15fr;
+      gap: 14px;
+    }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .mat-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 480px) { .mat-cards { grid-template-columns: 1fr; } }
+
+    .mat-card {
+      border: 2px solid #e2e8f0;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .mat-card:active { transform: scale(0.98); }
+    .mat-card.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .mat-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .mat-card-name { font-size: 13px; font-weight: 800; color: var(--text); }
+    .mat-card.active .mat-card-name { color: var(--primary); }
+    .mat-card-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .mat-card.active .mat-card-tag {
+      background: #fff;
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+    .mat-card-meta { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .chip-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      flex: 1 1 auto;
+      text-align: center;
+      min-width: 50px;
+    }
+    .chip-btn:active:not(:disabled) { transform: scale(0.96); }
+    .chip-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .stepper-row {
+      display: grid;
+      grid-template-columns: 46px 1fr 46px;
+      gap: 8px;
+      align-items: center;
+      background: var(--surface-alt);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .step-btn {
+      width: 46px;
+      height: 40px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 22px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .step-btn:active:not(:disabled) { background: var(--primary-light); color: var(--primary); transform: scale(0.95); }
+    .step-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .stepper-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 4px;
+    }
+    .stepper-val { font-size: 16px; font-weight: 800; color: var(--primary); }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+    .segmented-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      padding: 10px 6px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .seg-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .seg-btn:disabled { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+
+    .note-box {
+      background: var(--surface-alt);
+      border-left: 3px solid var(--primary);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      user-select: none;
+    }
+    .checkbox-row input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi {
+      background: var(--surface-alt);
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .kpi.highlight { background: var(--primary-light); border-color: var(--primary-border); }
+    .kpi.profit { background: var(--success-light); border-color: #86efac; }
+    .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 3px; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--text); }
+    .kpi.highlight .kpi-value { color: var(--primary); }
+    .kpi.profit .kpi-value { color: var(--success); }
+    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+
+    .bar-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .bar-item.selected { background: var(--primary-light); border-color: var(--primary-border); }
+    .bar-header { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; gap: 8px; }
+    .bar-track { width: 100%; height: 10px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; background: #94a3b8; border-radius: 6px; transition: width 0.2s ease; }
+    .bar-item.selected .bar-fill { background: var(--primary); }
+    .bar-item.selected .bar-header { color: var(--primary); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: var(--surface-alt); font-weight: 700; color: var(--text-muted); }
+    .right { text-align: right; font-weight: 700; }
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-badge">IzoFuk</div>
+        <div class="brand-title">
+          <h1>Kalkulačka fúkaných izolácií</h1>
+          <p>misoreiter-cpu.github.io/FukKalkul • Automatické ukladanie nastavení</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn" id="btnResetAll">Obnoviť predvolené</button>
+        <button type="button" class="btn btn-primary" id="btnCopySummary">Kopírovať kalkuláciu</button>
+      </div>
+    </header>
+
+    <div class="install-banner" id="installBanner">
+      <span><strong>Appka na plochu:</strong> V Safari ťukni na <em>Zdieľať</em> &rarr; <em>Pridať na plochu</em> (v Chrome <em>Menu &rarr; Pridať na plochu</em>).</span>
+      <button type="button" class="btn" style="padding:5px 10px; font-size:11.5px;" id="btnHideBanner">Rozumiem</button>
+    </div>
+
+    <div class="grid">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="card">
+          <div class="card-title"><span>1. Výber materiálu (ťukni na kartu)</span></div>
+          <div class="mat-cards" id="materialCards"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span>2. Konštrukcia, hrúbka a plocha</span></div>
+
+          <div class="form-group">
+            <div class="field-header"><span>Typ konštrukcie (podľa technického listu)</span></div>
+            <div class="segmented" id="appTypeGroup">
+              <button type="button" class="seg-btn active" data-app="volne">Voľne vodorovne</button>
+              <button type="button" class="seg-btn" data-app="dutina">Vodorovná dutina</button>
+              <button type="button" class="seg-btn" data-app="sklon">Šikmina / steny</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header">
+              <span>Hrúbka izolácie</span>
+              <span style="font-size:11.5px; color:var(--text-muted);">Ťukni alebo dolaď po 1 cm</span>
+            </div>
+            <div class="chip-row" id="thicknessChips"></div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="thickDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="thicknessDisplay">30 cm</span>
+                <input type="range" id="thicknessSlider" min="10" max="60" step="1" value="30" />
+              </div>
+              <button type="button" class="step-btn" id="thickInc">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header">
+              <span>Plocha zateplenia</span>
+              <span style="font-size:11.5px; color:var(--text-muted);">Ťukni alebo dolaď po 5 m²</span>
+            </div>
+            <div class="chip-row" id="areaChips"></div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="areaDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="areaDisplay">170 m²</span>
+                <input type="range" id="areaSlider" min="10" max="500" step="5" value="170" />
+              </div>
+              <button type="button" class="step-btn" id="areaInc">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header">
+              <span>Objemová hmotnosť (hustota)</span>
+              <span style="font-size:11.5px; color:var(--primary); font-weight:700;" id="densityModeBadge">Automaticky podľa TL</span>
+            </div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="densityDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="densityDisplay">25 kg/m³</span>
+                <input type="range" id="densitySlider" min="15" max="65" step="1" value="25" />
+              </div>
+              <button type="button" class="step-btn" id="densityInc">+</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:12px; color:var(--text-muted);" id="tlRangeText">Norma TL: 25 kg/m³</span>
+              <button type="button" id="resetTlBtn" class="btn" style="padding:5px 10px; font-size:11.5px;">Použiť normu TL</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header"><span>Odberová cenová hladina</span></div>
+            <div class="segmented segmented-2" id="tierGroup">
+              <button type="button" id="tierSkladBtn" class="seg-btn active" data-tier="sklad">Sklad Žilina / Kusový odber</button>
+              <button type="button" id="tierKamionBtn" class="seg-btn" data-tier="kamion">Kamión / 1/2 kamióna</button>
+            </div>
+            <label class="checkbox-row">
+              <input type="checkbox" id="palletFeeCheck" />
+              <span>Započítať poplatok za palety (5,00 € bez DPH / paleta)</span>
+            </label>
+          </div>
+
+          <div class="note-box" id="materialNote"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span>3. Marža, práca a doprava (výber klikom)</span></div>
+
+          <div class="form-group">
+            <div class="field-header"><span>Percentuálna prirážka (marža)</span></div>
+            <div class="chip-row" id="markupChips"></div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="markupDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="markupDisplay">30 %</span>
+                <input type="range" id="markupSlider" min="0" max="100" step="1" value="30" />
+              </div>
+              <button type="button" class="step-btn" id="markupInc">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header"><span>Práca fúkania (€/m² bez DPH)</span></div>
+            <div class="chip-row" id="laborChips"></div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="laborDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="laborDisplay">0,00 €/m²</span>
+                <input type="range" id="laborSlider" min="0" max="20" step="0.5" value="0" />
+              </div>
+              <button type="button" class="step-btn" id="laborInc">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="field-header"><span>Doprava / réžia na zákazku (€ bez DPH)</span></div>
+            <div class="chip-row" id="transportChips"></div>
+            <div class="stepper-row">
+              <button type="button" class="step-btn" id="transportDec">&minus;</button>
+              <div class="stepper-center">
+                <span class="stepper-val" id="transportDisplay">0 €</span>
+                <input type="range" id="transportSlider" min="0" max="500" step="10" value="0" />
+              </div>
+              <button type="button" class="step-btn" id="transportInc">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="card">
+          <div class="card-title">
+            <span>4. Výsledok kalkulácie pre zákazníka</span>
+            <span style="font-size:12px; color:var(--text-muted);" id="volumeBadge">Objem: 51,0 m³</span>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi highlight">
+              <div class="kpi-label">Cena pre zákazníka / m²</div>
+              <div class="kpi-value" id="kpiSellM2NoVat">12,74 €</div>
+              <div class="kpi-sub" id="kpiSellM2WithVat">15,67 € s 23 % DPH</div>
+            </div>
+
+            <div class="kpi highlight">
+              <div class="kpi-label">Celková cena zákazky</div>
+              <div class="kpi-value" id="kpiSellTotalNoVat">2 165,52 €</div>
+              <div class="kpi-sub" id="kpiSellTotalWithVat">2 663,59 € s 23 % DPH</div>
+            </div>
+
+            <div class="kpi">
+              <div class="kpi-label">Vlastné náklady spolu (bez DPH)</div>
+              <div class="kpi-value" id="kpiCostTotalNoVat">1 665,79 €</div>
+              <div class="kpi-sub" id="kpiCostBreakdown">Materiál: 9,80 €/m² + Práca/dopr.: 0,00 €/m²</div>
+            </div>
+
+            <div class="kpi profit">
+              <div class="kpi-label">Čistý zisk zo zákazky (bez DPH)</div>
+              <div class="kpi-value" id="kpiProfitTotal">499,74 €</div>
+              <div class="kpi-sub" id="kpiProfitM2">2,94 € / m²</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Technický a skladový parameter</th>
+                <th class="right">Hodnota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nákupná cena materiálu za 1 kg / 1 m³ (bez DPH)</td>
+                <td class="right" id="tblUnitCost">1,3065 €/kg | 32,66 €/m³</td>
+              </tr>
+              <tr>
+                <td>Celková hmotnosť materiálu na zákazku</td>
+                <td class="right" id="tblTotalKg">1 275,0 kg</td>
+              </tr>
+              <tr>
+                <td>Potrebný počet balení (zaokrúhlené nahor)</td>
+                <td class="right" id="tblBags">85 balíkov (à 15 kg)</td>
+              </tr>
+              <tr>
+                <td>Počet paliet</td>
+                <td class="right" id="tblPallets">3,54 palety (24 bal./pal.)</td>
+              </tr>
+              <tr>
+                <td>Tepelný odpor vrstvy R (pri &lambda;<sub>D</sub>)</td>
+                <td class="right" id="tblRValue">7,14 m²&middot;K/W (&lambda; = 0,042)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>5. Porovnanie všetkých materiálov (ťukni pre prepnutie)</span>
+            <label style="font-size:12px; font-weight:600; margin:0; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="hidePolystyreneCheck" checked />
+              <span>Skryť polystyrén</span>
+            </label>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted);">
+            Koncová cena pre zákazníka za 1 m² bez DPH pri aktuálnej hrúbke, konštrukcii a marži:
+          </p>
+          <div class="bar-list" id="comparisonChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>IzoFuk • misoreiter-cpu.github.io/FukKalkul • Nastavenia sa automaticky ukladajú v zariadení</footer>
+  </div>
+
+  <div class="toast" id="toast">Kalkulácia bola skopírovaná do schránky!</div>
+
+  <script>
+    (function() {
+      var STORAGE_KEY = "izofuk_kalkulacka_state_v1";
+      var BANNER_KEY = "izofuk_kalkulacka_banner_hidden";
+
+      try {
+        var iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#0f766e"/><text x="96" y="112" font-family="Arial,sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">IzoFuk</text></svg>';
+        var manifestObj = {
+          name: "IzoFuk Kalkulačka",
+          short_name: "IzoFuk",
+          start_url: "/FukKalkul/",
+          scope: "/FukKalkul/",
+          display: "standalone",
+          background_color: "#f1f5f9",
+          theme_color: "#0f766e",
+          icons: [{ src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconSvg), sizes: "192x192", type: "image/svg+xml" }]
+        };
+        var blob = new Blob([JSON.stringify(manifestObj)], { type: "application/manifest+json" });
+        document.getElementById("pwa-manifest").setAttribute("href", URL.createObjectURL(blob));
+      } catch (e) {}
+
+      var MATERIALS = [
+        {
+          id: "isover_gulull",
+          name: "ISOVER Gulull / Insulfit",
+          category: "Sklená vlna",
+          bagKg: 15.0,
+          bagsPallet: 24,
+          priceKgSklad: 470.34 / 360.0,
+          priceKgKamion: null,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.042, dutina: 0.039, sklon: 0.039 },
+          densityRules: {
+            volne: { le25: 25, b26_30: 25, gt30: 25, range: "25 kg/m³ (norma DoP)" },
+            dutina: { le25: 30, b26_30: 30, gt30: 30, range: "30–35 kg/m³ (dutiny)" },
+            sklon: { le25: 30, b26_30: 30, gt30: 35, range: "30–35 kg/m³ (šikminy)" }
+          },
+          note: "Zľava 33 % z 1,95 €/kg -> 1,3065 €/kg bez DPH (paleta 360 kg = 470,34 € bez DPH)."
+        },
+        {
+          id: "climaglass_w",
+          name: "CLIMAGLASS W (CIUR)",
+          category: "Sklená vlna",
+          bagKg: 10.0,
+          bagsPallet: 35,
+          priceKgSklad: 13.43 / 10.0,
+          priceKgKamion: 12.39 / 10.0,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.044, dutina: 0.044, sklon: 0.038 },
+          densityRules: {
+            volne: { le25: 20, b26_30: 23, gt30: 34, range: "10–25cm: 16–25 | 25–30cm: 18–28 | >30cm: 28–40 kg/m³" },
+            dutina: { le25: 23, b26_30: 24, gt30: 39, range: "10–25cm: 18–28 | 25–30cm: 19–28 | >30cm: 28–50 kg/m³" },
+            sklon: { le25: 30, b26_30: 30, gt30: 35, range: "do 30cm: 28–32 | >30cm: >32 kg/m³" }
+          },
+          note: "Podľa TL CIUR stúpa predpísaná hustota nad 30 cm zo 18–28 na 28–40 kg/m³."
+        },
+        {
+          id: "climastone_s",
+          name: "CLIMASTONE S",
+          category: "Kamenná vlna",
+          bagKg: 15.0,
+          bagsPallet: 35,
+          priceKgSklad: 11.75 / 15.0,
+          priceKgKamion: 11.25 / 15.0,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.038, dutina: 0.037, sklon: 0.037 },
+          densityRules: {
+            volne: { le25: 35, b26_30: 35, gt30: 40, range: "35–40 kg/m³ (voľne)" },
+            dutina: { le25: 45, b26_30: 45, gt30: 50, range: "45–55 kg/m³ (dutina)" },
+            sklon: { le25: 50, b26_30: 55, gt30: 55, range: "50–60 kg/m³ (šikmina)" }
+          },
+          note: "Najnižšia nákupná cena za 1 kg (0,7833 € sklad / 0,7500 € kamión)."
+        },
+        {
+          id: "climatizer_plus",
+          name: "Climatizer Plus (CIUR)",
+          category: "Celulóza",
+          bagKg: 12.0,
+          bagsPallet: 45,
+          priceKgSklad: 10.87 / 12.0,
+          priceKgKamion: 9.89 / 12.0,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.038, dutina: 0.038, sklon: 0.038 },
+          densityRules: {
+            volne: { le25: 32, b26_30: 35, gt30: 38, range: "30–40 kg/m³ (voľne)" },
+            dutina: { le25: 45, b26_30: 45, gt30: 50, range: "45–55 kg/m³ (dutina)" },
+            sklon: { le25: 50, b26_30: 55, gt30: 55, range: "50–60 kg/m³ (šikmina)" }
+          },
+          note: "Úspora 9,0 % pri odbere 1/2 kamióna (13 paliet) alebo celého kamióna (26 paliet)."
+        },
+        {
+          id: "climawood",
+          name: "CLIMAWOOD",
+          category: "Drevovlákno",
+          bagKg: 15.0,
+          bagsPallet: 21,
+          priceKgSklad: 14.41 / 15.0,
+          priceKgKamion: 13.98 / 15.0,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.038, dutina: 0.038, sklon: 0.038 },
+          densityRules: {
+            volne: { le25: 32, b26_30: 35, gt30: 38, range: "30–38 kg/m³ (voľne)" },
+            dutina: { le25: 38, b26_30: 40, gt30: 42, range: "38–45 kg/m³ (dutina)" },
+            sklon: { le25: 40, b26_30: 42, gt30: 45, range: "40–45 kg/m³ (šikmina)" }
+          },
+          note: "Výborná ochrana proti letnému prehrievaniu podkrovia."
+        },
+        {
+          id: "ursa_pure_floc",
+          name: "URSA PURE FLOC",
+          category: "Sklená vlna",
+          bagKg: 16.6,
+          bagsPallet: 39,
+          priceKgSklad: 30.83 / 16.6,
+          priceKgKamion: null,
+          isFixedM3: false,
+          lambdaMap: { volne: 0.038, dutina: 0.036, sklon: 0.035 },
+          densityRules: {
+            volne: { le25: 20, b26_30: 22, gt30: 25, range: "20–25 kg/m³ (voľne)" },
+            dutina: { le25: 28, b26_30: 30, gt30: 32, range: "28–32 kg/m³ (dutina)" },
+            sklon: { le25: 32, b26_30: 32, gt30: 35, range: "32–35 kg/m³ (šikmina)" }
+          },
+          note: "Kamiónová cena v cenníku VUNO HREUS na vyžiadanie."
+        },
+        {
+          id: "climastyren",
+          name: "CLIMASTYREN",
+          category: "Polystyrén 1 m³",
+          bagKg: 16.5,
+          bagsPallet: 1,
+          priceKgSklad: 319.98 / 16.5,
+          priceKgKamion: null,
+          isFixedM3: true,
+          fixedPriceM3: 319.98,
+          lambdaMap: { volne: 0.035, dutina: 0.035, sklon: 0.035 },
+          densityRules: {
+            volne: { le25: 16.5, b26_30: 16.5, gt30: 16.5, range: "1 bag = 1 m³ (cca 15–18 kg)" },
+            dutina: { le25: 16.5, b26_30: 16.5, gt30: 16.5, range: "1 bag = 1 m³ (cca 15–18 kg)" },
+            sklon: { le25: 16.5, b26_30: 16.5, gt30: 16.5, range: "1 bag = 1 m³ (cca 15–18 kg)" }
+          },
+          note: "Predáva sa priamo na objem: 1 bag = 1 m³ za 319,98 € bez DPH."
+        }
+      ];
+
+      var PRESET_THICKNESS = [15, 20, 25, 30, 35, 40, 50];
+      var PRESET_AREA = [80, 100, 120, 150, 170, 200, 250];
+      var PRESET_MARKUP = [0, 15, 20, 25, 30, 35, 40, 50];
+      var PRESET_LABOR = [0, 3, 4, 5, 6, 8];
+      var PRESET_TRANSPORT = [0, 50, 100, 150, 200, 300];
+
+      var DEFAULT_STATE = {
+        materialId: "isover_gulull",
+        appType: "volne",
+        thicknessCm: 30,
+        areaM2: 170,
+        density: 25,
+        manualDensity: false,
+        tier: "sklad",
+        palletFee: false,
+        hidePolystyrene: true,
+        markupPct: 30,
+        laborM2: 0,
+        transportFlat: 0
+      };
+
+      var state = Object.assign({}, DEFAULT_STATE);
+
+      function loadSavedState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") {
+              state = Object.assign({}, DEFAULT_STATE, parsed);
+            }
+          }
+          if (localStorage.getItem(BANNER_KEY) === "1") {
+            document.getElementById("installBanner").style.display = "none";
+          }
+        } catch (e) {}
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function fmtEur(num) {
+        return num.toFixed(2).replace(".", ",") + " €";
+      }
+
+      function fmtNum(num, dec) {
+        return num.toFixed(dec).replace(".", ",");
+      }
+
+      function getRecommendedDensity(mat, appType, thicknessCm) {
+        var rule = mat.densityRules[appType];
+        if (thicknessCm <= 25) return rule.le25;
+        if (thicknessCm <= 30) return rule.b26_30;
+        return rule.gt30;
+      }
+
+      function buildMaterialCards() {
+        var container = document.getElementById("materialCards");
+        container.innerHTML = "";
+        MATERIALS.forEach(function(m) {
+          var card = document.createElement("button");
+          card.type = "button";
+          card.className = "mat-card" + (m.id === state.materialId ? " active" : "");
+          card.setAttribute("data-id", m.id);
+
+          var basePriceText = m.isFixedM3
+            ? "319,98 €/m³"
+            : fmtNum(m.priceKgSklad, 2) + " €/kg • " + m.bagKg + " kg/bal.";
+
+          card.innerHTML =
+            '<div class="mat-card-top">' +
+              '<span class="mat-card-name">' + m.name + '</span>' +
+              '<span class="mat-card-tag">' + m.category + '</span>' +
+            '</div>' +
+            '<span class="mat-card-meta">' + basePriceText + '</span>';
+
+          card.addEventListener("click", function() {
+            selectMaterial(m.id);
+          });
+          container.appendChild(card);
+        });
+      }
+
+      function buildChips(containerId, values, suffix, onSelectFn) {
+        var container = document.getElementById(containerId);
+        container.innerHTML = "";
+        values.forEach(function(v) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip-btn";
+          btn.setAttribute("data-val", String(v));
+          btn.textContent = v + suffix;
+          btn.addEventListener("click", function() {
+            onSelectFn(v);
+          });
+          container.appendChild(btn);
+        });
+      }
+
+      function syncUIFromState() {
+        document.querySelectorAll(".mat-card").forEach(function(c) {
+          c.classList.toggle("active", c.getAttribute("data-id") === state.materialId);
+        });
+        document.querySelectorAll("#appTypeGroup .seg-btn").forEach(function(btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-app") === state.appType);
+        });
+        document.querySelectorAll("#tierGroup .seg-btn").forEach(function(btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-tier") === state.tier);
+        });
+        document.getElementById("thicknessSlider").value = state.thicknessCm;
+        document.getElementById("areaSlider").value = state.areaM2;
+        document.getElementById("densitySlider").value = Math.min(65, Math.max(15, Math.round(state.density)));
+        document.getElementById("markupSlider").value = state.markupPct;
+        document.getElementById("laborSlider").value = state.laborM2;
+        document.getElementById("transportSlider").value = state.transportFlat;
+        document.getElementById("palletFeeCheck").checked = !!state.palletFee;
+        document.getElementById("hidePolystyreneCheck").checked = !!state.hidePolystyrene;
+      }
+
+      function selectMaterial(id) {
+        state.materialId = id;
+        document.querySelectorAll(".mat-card").forEach(function(c) {
+          c.classList.toggle("active", c.getAttribute("data-id") === id);
+        });
+        updateTierAvailability();
+        syncDensityFromTL(false);
+        recalculate();
+      }
+
+      function updateTierAvailability() {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        var kamionBtn = document.getElementById("tierKamionBtn");
+        if (mat.priceKgKamion === null) {
+          kamionBtn.disabled = true;
+          if (state.tier === "kamion") {
+            state.tier = "sklad";
+            document.getElementById("tierSkladBtn").classList.add("active");
+            kamionBtn.classList.remove("active");
+          }
+        } else {
+          kamionBtn.disabled = false;
+        }
+      }
+
+      function syncDensityFromTL(forceOverwrite) {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        if (forceOverwrite || !state.manualDensity) {
+          var rec = getRecommendedDensity(mat, state.appType, state.thicknessCm);
+          state.density = rec;
+          state.manualDensity = false;
+        }
+
+        var dSlider = document.getElementById("densitySlider");
+        dSlider.value = Math.min(65, Math.max(15, Math.round(state.density)));
+        dSlider.disabled = mat.isFixedM3;
+        document.getElementById("densityDec").disabled = mat.isFixedM3;
+        document.getElementById("densityInc").disabled = mat.isFixedM3;
+      }
+
+      function setAppType(type) {
+        state.appType = type;
+        document.querySelectorAll("#appTypeGroup .seg-btn").forEach(function(btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-app") === type);
+        });
+        if (!state.manualDensity) syncDensityFromTL(false);
+        recalculate();
+      }
+
+      function setTier(tier) {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        if (tier === "kamion" && mat.priceKgKamion === null) return;
+        state.tier = tier;
+        document.querySelectorAll("#tierGroup .seg-btn").forEach(function(btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-tier") === tier);
+        });
+        recalculate();
+      }
+
+      function setThickness(val) {
+        val = Math.min(60, Math.max(10, parseInt(val, 10) || 30));
+        state.thicknessCm = val;
+        document.getElementById("thicknessSlider").value = val;
+        if (!state.manualDensity) syncDensityFromTL(false);
+        recalculate();
+      }
+
+      function setArea(val) {
+        val = Math.min(500, Math.max(10, parseInt(val, 10) || 100));
+        state.areaM2 = val;
+        document.getElementById("areaSlider").value = val;
+        recalculate();
+      }
+
+      function setManualDensity(val) {
+        val = Math.min(65, Math.max(15, parseInt(val, 10) || 25));
+        state.manualDensity = true;
+        state.density = val;
+        document.getElementById("densitySlider").value = val;
+        recalculate();
+      }
+
+      function setMarkup(val) {
+        val = Math.min(100, Math.max(0, parseInt(val, 10) || 0));
+        state.markupPct = val;
+        document.getElementById("markupSlider").value = val;
+        recalculate();
+      }
+
+      function setLabor(val) {
+        val = Math.min(20, Math.max(0, Math.round((parseFloat(val) || 0) * 10) / 10));
+        state.laborM2 = val;
+        document.getElementById("laborSlider").value = val;
+        recalculate();
+      }
+
+      function setTransport(val) {
+        val = Math.min(500, Math.max(0, parseInt(val, 10) || 0));
+        state.transportFlat = val;
+        document.getElementById("transportSlider").value = val;
+        recalculate();
+      }
+
+      function updateActiveChips(containerId, currentVal) {
+        document.querySelectorAll("#" + containerId + " .chip-btn").forEach(function(btn) {
+          btn.classList.toggle("active", parseFloat(btn.getAttribute("data-val")) === currentVal);
+        });
+      }
+
+      function calcForMaterial(mat, customDensity) {
+        var h = state.thicknessCm / 100.0;
+        var volumeM3 = state.areaM2 * h;
+        var density = (customDensity !== null && customDensity !== undefined)
+          ? customDensity
+          : getRecommendedDensity(mat, state.appType, state.thicknessCm);
+        var effKgPrice = (state.tier === "kamion" && mat.priceKgKamion !== null)
+          ? mat.priceKgKamion
+          : mat.priceKgSklad;
+
+        var matCostNoVat = 0;
+        var costM3NoVat = 0;
+        var totalKg = 0;
+        var bagsExact = 0;
+        var bagsRounded = 0;
+        var palletsExact = 0;
+
+        if (mat.isFixedM3) {
+          costM3NoVat = mat.fixedPriceM3;
+          var palletSurcharge = state.palletFee ? Math.ceil(volumeM3) * 5.0 : 0;
+          matCostNoVat = (volumeM3 * mat.fixedPriceM3) + palletSurcharge;
+          totalKg = volumeM3 * 16.5;
+          bagsExact = volumeM3;
+          bagsRounded = Math.ceil(bagsExact);
+          palletsExact = bagsRounded;
+        } else {
+          costM3NoVat = density * effKgPrice;
+          totalKg = volumeM3 * density;
+          bagsExact = totalKg / mat.bagKg;
+          bagsRounded = Math.ceil(bagsExact);
+          palletsExact = bagsRounded / mat.bagsPallet;
+          var palletSurcharge2 = state.palletFee ? Math.ceil(palletsExact) * 5.0 : 0;
+          matCostNoVat = (totalKg * effKgPrice) + palletSurcharge2;
+        }
+
+        var matM2NoVat = matCostNoVat / state.areaM2;
+        var totalCostNoVat = matCostNoVat + (state.areaM2 * state.laborM2) + state.transportFlat;
+        var sellTotalNoVat = totalCostNoVat * (1 + state.markupPct / 100.0);
+        var sellM2NoVat = sellTotalNoVat / state.areaM2;
+        var sellTotalWithVat = sellTotalNoVat * 1.23;
+        var sellM2WithVat = sellM2NoVat * 1.23;
+        var profitTotalNoVat = sellTotalNoVat - totalCostNoVat;
+        var profitM2NoVat = profitTotalNoVat / state.areaM2;
+        var lambda = mat.lambdaMap[state.appType];
+        var rValue = h / lambda;
+
+        return {
+          volumeM3: volumeM3,
+          density: density,
+          effKgPrice: effKgPrice,
+          costM3NoVat: costM3NoVat,
+          matCostNoVat: matCostNoVat,
+          matM2NoVat: matM2NoVat,
+          totalCostNoVat: totalCostNoVat,
+          sellTotalNoVat: sellTotalNoVat,
+          sellM2NoVat: sellM2NoVat,
+          sellTotalWithVat: sellTotalWithVat,
+          sellM2WithVat: sellM2WithVat,
+          profitTotalNoVat: profitTotalNoVat,
+          profitM2NoVat: profitM2NoVat,
+          totalKg: totalKg,
+          bagsExact: bagsExact,
+          bagsRounded: bagsRounded,
+          palletsExact: palletsExact,
+          lambda: lambda,
+          rValue: rValue
+        };
+      }
+
+      function recalculate() {
+        state.palletFee = document.getElementById("palletFeeCheck").checked;
+        state.hidePolystyrene = document.getElementById("hidePolystyreneCheck").checked;
+        saveState();
+
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        var res = calcForMaterial(mat, state.density);
+
+        document.getElementById("thicknessDisplay").textContent = state.thicknessCm + " cm";
+        document.getElementById("areaDisplay").textContent = state.areaM2 + " m²";
+        document.getElementById("densityDisplay").textContent = mat.isFixedM3 ? "1 bag = 1 m³" : state.density + " kg/m³";
+        document.getElementById("markupDisplay").textContent = state.markupPct + " %";
+        document.getElementById("laborDisplay").textContent = fmtEur(state.laborM2) + "/m²";
+        document.getElementById("transportDisplay").textContent = state.transportFlat + " €";
+
+        updateActiveChips("thicknessChips", state.thicknessCm);
+        updateActiveChips("areaChips", state.areaM2);
+        updateActiveChips("markupChips", state.markupPct);
+        updateActiveChips("laborChips", state.laborM2);
+        updateActiveChips("transportChips", state.transportFlat);
+
+        var modeBadge = document.getElementById("densityModeBadge");
+        var resetBtn = document.getElementById("resetTlBtn");
+        if (mat.isFixedM3) {
+          modeBadge.textContent = "Pevný objem 1 m³";
+          modeBadge.style.color = "var(--text-muted)";
+          resetBtn.disabled = true;
+        } else if (state.manualDensity) {
+          modeBadge.textContent = "Ručná úprava";
+          modeBadge.style.color = "var(--accent)";
+          resetBtn.disabled = false;
+        } else {
+          modeBadge.textContent = "Automaticky podľa TL";
+          modeBadge.style.color = "var(--primary)";
+          resetBtn.disabled = true;
+        }
+
+        document.getElementById("tlRangeText").textContent = "Norma TL: " + mat.densityRules[state.appType].range;
+        document.getElementById("materialNote").textContent = mat.note + (mat.priceKgKamion === null ? " (Kamiónová cena nie je v cenníku – aktívny odber Sklad.)" : "");
+        document.getElementById("volumeBadge").textContent = "Objem: " + fmtNum(res.volumeM3, 1) + " m³";
+
+        document.getElementById("kpiSellM2NoVat").textContent = fmtEur(res.sellM2NoVat);
+        document.getElementById("kpiSellM2WithVat").textContent = fmtEur(res.sellM2WithVat) + " s 23 % DPH";
+        document.getElementById("kpiSellTotalNoVat").textContent = fmtEur(res.sellTotalNoVat);
+        document.getElementById("kpiSellTotalWithVat").textContent = fmtEur(res.sellTotalWithVat) + " s 23 % DPH";
+        document.getElementById("kpiCostTotalNoVat").textContent = fmtEur(res.totalCostNoVat);
+        document.getElementById("kpiCostBreakdown").textContent = "Materiál: " + fmtEur(res.matM2NoVat) + "/m² + Práca/dopr.: " + fmtEur((res.totalCostNoVat - res.matCostNoVat) / state.areaM2) + "/m²";
+        document.getElementById("kpiProfitTotal").textContent = fmtEur(res.profitTotalNoVat);
+        document.getElementById("kpiProfitM2").textContent = fmtEur(res.profitM2NoVat) + " / m²";
+
+        document.getElementById("tblUnitCost").textContent = mat.isFixedM3
+          ? "319,98 €/m³"
+          : fmtNum(res.effKgPrice, 4) + " €/kg | " + fmtEur(res.costM3NoVat) + "/m³";
+        document.getElementById("tblTotalKg").textContent = fmtNum(res.totalKg, 1) + " kg";
+        document.getElementById("tblBags").textContent = mat.isFixedM3
+          ? res.bagsRounded + " bagov (à 1 m³)"
+          : res.bagsRounded + " balíkov (presne " + fmtNum(res.bagsExact, 1) + " ks à " + mat.bagKg + " kg)";
+        document.getElementById("tblPallets").textContent = mat.isFixedM3
+          ? res.bagsRounded + " ks"
+          : fmtNum(res.palletsExact, 2) + " palety (" + mat.bagsPallet + " bal./pal.)";
+        document.getElementById("tblRValue").innerHTML = fmtNum(res.rValue, 2) + " m²&middot;K/W (&lambda; = " + fmtNum(res.lambda, 3) + ")";
+
+        renderChart();
+      }
+
+      function renderChart() {
+        var list = MATERIALS.filter(function(m) { return !state.hidePolystyrene || !m.isFixedM3; });
+        var computed = list.map(function(m) {
+          var d = (m.id === state.materialId) ? state.density : getRecommendedDensity(m, state.appType, state.thicknessCm);
+          return { mat: m, res: calcForMaterial(m, d) };
+        }).sort(function(a, b) { return a.res.sellM2NoVat - b.res.sellM2NoVat; });
+
+        var maxVal = Math.max.apply(null, computed.map(function(c) { return c.res.sellM2NoVat; }).concat([1]));
+        var container = document.getElementById("comparisonChart");
+        container.innerHTML = "";
+
+        computed.forEach(function(item) {
+          var pct = Math.min(100, (item.res.sellM2NoVat / maxVal) * 100);
+          var isSel = item.mat.id === state.materialId;
+          var div = document.createElement("div");
+          div.className = "bar-item" + (isSel ? " selected" : "");
+          div.addEventListener("click", function() {
+            selectMaterial(item.mat.id);
+          });
+          div.innerHTML =
+            '<div class="bar-header">' +
+              '<span>' + item.mat.name + ' (' + (item.mat.isFixedM3 ? "1 m³" : item.res.density + " kg/m³") + ')</span>' +
+              '<span>' + fmtEur(item.res.sellM2NoVat) + '/m² (' + fmtEur(item.res.sellTotalNoVat) + ')</span>' +
+            '</div>' +
+            '<div class="bar-track">' +
+              '<div class="bar-fill" style="width:' + pct + '%"></div>' +
+            '</div>';
+          container.appendChild(div);
+        });
+      }
+
+      function showToast() {
+        var toast = document.getElementById("toast");
+        toast.classList.add("show");
+        setTimeout(function() { toast.classList.remove("show"); }, 2500);
+      }
+
+      function copySummary() {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        var res = calcForMaterial(mat, state.density);
+        var appNames = { volne: "Voľne vodorovne", dutina: "Vodorovná dutina", sklon: "Šikmina / steny" };
+        var lines = [
+          "IzoFuk – Kalkulácia fúkanej izolácie",
+          "Materiál: " + mat.name,
+          "Konštrukcia: " + appNames[state.appType] + " | Hustota: " + (mat.isFixedM3 ? "1 m³" : state.density + " kg/m³"),
+          "Plocha: " + state.areaM2 + " m² | Hrúbka: " + state.thicknessCm + " cm | Objem: " + fmtNum(res.volumeM3, 1) + " m³",
+          "Spotreba: " + fmtNum(res.totalKg, 1) + " kg (" + res.bagsRounded + " balíkov / " + fmtNum(res.palletsExact, 2) + " palety)",
+          "Vlastné náklady (bez DPH): " + fmtEur(res.totalCostNoVat) + " (materiál " + fmtEur(res.matM2NoVat) + "/m²)",
+          "Prirážka: " + state.markupPct + " % | Čistý zisk (bez DPH): " + fmtEur(res.profitTotalNoVat),
+          "Cena pre zákazníka: " + fmtEur(res.sellM2NoVat) + "/m² bez DPH (" + fmtEur(res.sellM2WithVat) + "/m² s DPH)",
+          "Celková cena zákazky: " + fmtEur(res.sellTotalNoVat) + " bez DPH (" + fmtEur(res.sellTotalWithVat) + " s DPH)"
+        ];
+        var text = lines.join(String.fromCharCode(10));
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(showToast).catch(function() { fallbackCopy(text); });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast();
+      }
+
+      function resetDefaults() {
+        state = Object.assign({}, DEFAULT_STATE);
+        saveState();
+        syncUIFromState();
+        updateTierAvailability();
+        syncDensityFromTL(true);
+        recalculate();
+      }
+
+      loadSavedState();
+      buildMaterialCards();
+      buildChips("thicknessChips", PRESET_THICKNESS, " cm", setThickness);
+      buildChips("areaChips", PRESET_AREA, " m²", setArea);
+      buildChips("markupChips", PRESET_MARKUP, " %", setMarkup);
+      buildChips("laborChips", PRESET_LABOR, " €", setLabor);
+      buildChips("transportChips", PRESET_TRANSPORT, " €", setTransport);
+
+      document.querySelectorAll("#appTypeGroup .seg-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() { setAppType(btn.getAttribute("data-app")); });
+      });
+      document.querySelectorAll("#tierGroup .seg-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() { setTier(btn.getAttribute("data-tier")); });
+      });
+
+      document.getElementById("thickDec").addEventListener("click", function() { setThickness(state.thicknessCm - 1); });
+      document.getElementById("thickInc").addEventListener("click", function() { setThickness(state.thicknessCm + 1); });
+      document.getElementById("thicknessSlider").addEventListener("input", function(e) { setThickness(e.target.value); });
+
+      document.getElementById("areaDec").addEventListener("click", function() { setArea(state.areaM2 - 5); });
+      document.getElementById("areaInc").addEventListener("click", function() { setArea(state.areaM2 + 5); });
+      document.getElementById("areaSlider").addEventListener("input", function(e) { setArea(e.target.value); });
+
+      document.getElementById("densityDec").addEventListener("click", function() {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        if (!mat.isFixedM3) setManualDensity(state.density - 1);
+      });
+      document.getElementById("densityInc").addEventListener("click", function() {
+        var mat = MATERIALS.find(function(m) { return m.id === state.materialId; });
+        if (!mat.isFixedM3) setManualDensity(state.density + 1);
+      });
+      document.getElementById("densitySlider").addEventListener("input", function(e) { setManualDensity(e.target.value); });
+      document.getElementById("resetTlBtn").addEventListener("click", function() {
+        syncDensityFromTL(true);
+        recalculate();
+      });
+
+      document.getElementById("markupDec").addEventListener("click", function() { setMarkup(state.markupPct - 1); });
+      document.getElementById("markupInc").addEventListener("click", function() { setMarkup(state.markupPct + 1); });
+      document.getElementById("markupSlider").addEventListener("input", function(e) { setMarkup(e.target.value); });
+
+      document.getElementById("laborDec").addEventListener("click", function() { setLabor(state.laborM2 - 0.5); });
+      document.getElementById("laborInc").addEventListener("click", function() { setLabor(state.laborM2 + 0.5); });
+      document.getElementById("laborSlider").addEventListener("input", function(e) { setLabor(e.target.value); });
+
+      document.getElementById("transportDec").addEventListener("click", function() { setTransport(state.transportFlat - 10); });
+      document.getElementById("transportInc").addEventListener("click", function() { setTransport(state.transportFlat + 10); });
+      document.getElementById("transportSlider").addEventListener("input", function(e) { setTransport(e.target.value); });
+
+      document.getElementById("palletFeeCheck").addEventListener("change", recalculate);
+      document.getElementById("hidePolystyreneCheck").addEventListener("change", recalculate);
+      document.getElementById("btnResetAll").addEventListener("click", resetDefaults);
+      document.getElementById("btnCopySummary").addEventListener("click", copySummary);
+      document.getElementById("btnHideBanner").addEventListener("click", function() {
+        document.getElementById("installBanner").style.display = "none";
+        try { localStorage.setItem(BANNER_KEY, "1"); } catch (e) {}
+      });
+
+      syncUIFromState();
+      updateTierAvailability();
+      syncDensityFromTL(false);
+      recalculate();
+    })();
+  </script>
+</body>
+</html>
